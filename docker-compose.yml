@@ -1,0 +1,126 @@
+version: "3.9"
+
+# =============================================================================
+# VitalGov IdentityForge — Local Development Stack
+# =============================================================================
+# Services:
+#   postgres        — Application DB (data sovereignty: af-south-1 in production)
+#   openldap        — LDAP server for clinic federation testing
+#   phpldapadmin    — LDAP admin UI
+#   keycloak        — Identity provider (3 realms: staff, clinics, admin)
+#   vitalgov-api    — Node.js API
+#   anomaly-agent   — Python anomaly detection agent
+# =============================================================================
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: vitalgov-postgres
+    environment:
+      POSTGRES_DB: vitalgov
+      POSTGRES_USER: vitalgov_app
+      POSTGRES_PASSWORD: change-me-in-production
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infrastructure/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vitalgov_app -d vitalgov"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: vitalgov-ldap
+    environment:
+      LDAP_ORGANISATION: "VitalGov"
+      LDAP_DOMAIN: "vitalgov.gov.ng"
+      LDAP_ADMIN_PASSWORD: change-me-in-production
+    ports:
+      - "389:389"
+    volumes:
+      - ldap-data:/var/lib/ldap
+      - ldap-config:/etc/ldap/slapd.d
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:0.9.0
+    container_name: vitalgov-ldapadmin
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: openldap
+    ports:
+      - "8081:80"
+    depends_on:
+      - openldap
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: vitalgov-keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/vitalgov
+      KC_DB_USERNAME: vitalgov_app
+      KC_DB_PASSWORD: change-me-in-production
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin-change-me
+    volumes:
+      - ./keycloak-config/realms:/opt/keycloak/data/import
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health/ready || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  vitalgov-api:
+    build:
+      context: ./vitalgov-api
+      dockerfile: Dockerfile
+    container_name: vitalgov-api
+    env_file: ./vitalgov-api/.env.example
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: vitalgov
+      DB_USER: vitalgov_app
+      DB_PASSWORD: change-me-in-production
+      DATA_RESIDENCY_REGION: af-south-1
+      ALLOWED_DATA_REGIONS: af-south-1
+    ports:
+      - "3000:3000"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - api-logs:/var/log/vitalgov
+
+  anomaly-agent:
+    build:
+      context: ./detection
+      dockerfile: Dockerfile.anomaly
+    container_name: vitalgov-anomaly-agent
+    environment:
+      BULK_THRESHOLD_CLINICIAN: "200"
+      BULK_THRESHOLD_ADMIN: "50"
+      WINDOW_MINUTES: "10"
+      ALLOWED_DATA_REGIONS: "af-south-1"
+    volumes:
+      - api-logs:/var/log/vitalgov:ro
+    command: ["python", "agents/anomaly-agent.py", "--log-file", "/var/log/vitalgov/audit.log", "--mode", "stream"]
+    depends_on:
+      - vitalgov-api
+
+volumes:
+  postgres-data:
+  ldap-data:
+  ldap-config:
+  api-logs:

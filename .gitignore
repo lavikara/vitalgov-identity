@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+logs/
+certs/staff/*/staff.key
+certs/staff/*/staff.crt
+alerts/
+baselines/*.json
+__pycache__/
+*.pyc
+.DS_Store
