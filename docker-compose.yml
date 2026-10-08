@@ -83,7 +83,7 @@ services:
       context: ./vitalgov-api
       dockerfile: Dockerfile
     container_name: vitalgov-api
-    env_file: ./vitalgov-api/.env.example
+    env_file: ./vitalgov-api/.env
     environment:
       KEYCLOAK_URL: http://keycloak:8080
       DB_HOST: postgres
