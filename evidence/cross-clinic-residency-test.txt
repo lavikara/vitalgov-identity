@@ -1,0 +1,3 @@
+﻿2026-10-10 20:04:15,704 [WARNING] ALERT: {"model": "cross_clinic_access", "userId": "test-nurse-01", "tokenClinicId": "clinic-a", "accessedClinicId": "clinic-b", "nhaSections": ["Section 27"], "timestamp": "2026-10-10T19:04:15.704287+00:00", "severity": "HIGH"}
+2026-10-10 20:04:15,704 [WARNING] ALERT: {"model": "data_residency_violation", "userId": "test-nurse-01", "attestation": "eu-west-1", "requiredRegion": "af-south-1", "path": "/clinics/clinic-b/records/123", "nhaSections": ["Section 26", "Section 28"], "timestamp": "2026-10-10T19:04:15.704446+00:00", "severity": "HIGH"}
+2026-10-10 20:04:15,704 [INFO] Batch complete. Total alerts: 2
