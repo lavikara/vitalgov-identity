@@ -36,6 +36,8 @@ from datetime import datetime, timezone
 BULK_THRESHOLD_CLINICIAN = int(os.getenv("BULK_THRESHOLD_CLINICIAN", "200"))
 BULK_THRESHOLD_ADMIN = int(os.getenv("BULK_THRESHOLD_ADMIN", "50"))
 WINDOW_MINUTES = int(os.getenv("WINDOW_MINUTES", "10"))
+BULK_ALERT_COOLDOWN_MINUTES = 10
+BULK_ALERT_COOLDOWN_MINUTES = 10
 ALLOWED_DATA_REGION = os.getenv("ALLOWED_DATA_REGIONS", "af-south-1")
 ALERT_WEBHOOK = os.getenv("ALERT_WEBHOOK_URL", "")
 
@@ -47,11 +49,16 @@ logging.basicConfig(
 logger = logging.getLogger("vitalgov-anomaly")
 
 
+
 class AnomalyDetector:
     def __init__(self):
-        # {userId: [(timestamp, path, clinicId, attestation, roles), ...]}
+        # {userId: [(timestamp, path, clinicId, attestation), ...]}
         self.request_log: dict[str, list] = defaultdict(list)
         self.alerts: list[dict] = []
+        self.last_bulk_alert = {}
+
+        # Remember when each user last triggered a bulk-access alert
+        self.last_bulk_alert: dict[str, datetime] = {}
 
     def ingest(self, entry: dict):
         user_id = entry.get("userId", "unknown")
@@ -83,23 +90,44 @@ class AnomalyDetector:
             return BULK_THRESHOLD_CLINICIAN
         return BULK_THRESHOLD_ADMIN
 
+    
     def _check_bulk_access(self, user_id: str, entry: dict):
-        """Model 1: Bulk record access — role-adjusted threshold. (NHA Section 26)"""
-        cutoff = datetime.now(timezone.utc).timestamp() - (WINDOW_MINUTES * 60)
+        """Detect bulk record access with a 10-minute alert cooldown."""
+
+        now = datetime.now(timezone.utc)
+        cutoff = now.timestamp() - (WINDOW_MINUTES * 60)
+
         recent_records = [
             e for e in self.request_log[user_id]
             if e[0].timestamp() > cutoff and '/records/' in e[1]
         ]
+
         threshold = self._get_threshold(entry)
-        if len(recent_records) > threshold:
-            self._alert({
-                "model": "bulk_record_access",
-                "userId": user_id,
-                "recordAccessCount": len(recent_records),
-                "threshold": threshold,
-                "windowMinutes": WINDOW_MINUTES,
-                "nhaSections": ["Section 26"]
-            })
+        record_count = len(recent_records)
+
+        if record_count <= threshold:
+            return
+
+        last_alert = self.last_bulk_alert.get(user_id)
+
+        if last_alert is not None:
+            elapsed_seconds = (now - last_alert).total_seconds()
+
+            if elapsed_seconds < BULK_ALERT_COOLDOWN_MINUTES * 60:
+                return
+
+        self._alert({
+            "model": "bulk_record_access",
+            "userId": user_id,
+            "recordAccessCount": record_count,
+            "threshold": threshold,
+            "windowMinutes": WINDOW_MINUTES,
+            "cooldownMinutes": BULK_ALERT_COOLDOWN_MINUTES,
+            "nhaSections": ["Section 26"]
+        })
+
+        self.last_bulk_alert[user_id] = now
+
 
     def _check_cross_clinic(self, user_id: str, path: str, token_clinic_id: str):
         """Model 2: Token clinic_id does not match resource clinic_id. (NHA Section 27)"""

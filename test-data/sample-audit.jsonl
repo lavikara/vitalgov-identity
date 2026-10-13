@@ -1,3 +1,2 @@
-
-{"event":"api_request","timestamp":"2026-10-10T12:00:00+00:00","userId":"test-nurse-01","roles":["nurse"],"clinicId":"clinic-a","path":"/clinics/clinic-b/records/123","dataResidencyAttestation":"eu-west-1"}
-{"event":"api_request","timestamp":"2026-10-10T12:00:01+00:00","userId":"test-doctor-01","roles":["clinician"],"clinicId":"clinic-a","path":"/clinics/clinic-a/records/456","dataResidencyAttestation":"af-south-1"}
+{"event": "api_request", "timestamp": "2026-10-13T15:31:52.648457+00:00", "userId": "test-nurse-01", "roles": ["nurse"], "clinicId": "clinic-a", "path": "/clinics/clinic-b/records/123", "dataResidencyAttestation": "eu-west-1"}
+{"event": "api_request", "timestamp": "2026-10-13T15:31:52.648457+00:00", "userId": "test-doctor-01", "roles": ["clinician"], "clinicId": "clinic-a", "path": "/clinics/clinic-a/records/456", "dataResidencyAttestation": "af-south-1"}
