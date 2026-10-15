@@ -1,4 +1,4 @@
--- VitalGov IdentityForge — PostgreSQL Schema
+-- VitalGov IdentityForge - PostgreSQL Schema
 -- Data sovereignty: this database must run in af-south-1 (NHA Sections 26, 28)
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS clinics (
     registered_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Patient records (stub table — extend with real NHA-compliant schema)
+-- Patient records (stub table - extend with real NHA-compliant schema)
 CREATE TABLE IF NOT EXISTS patient_records (
     id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     patient_id    TEXT NOT NULL,

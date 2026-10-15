@@ -16,7 +16,7 @@ const axios = require('axios');
 const logger = require('../utils/logger');
 const router = express.Router();
 
-// GET /api/clinics/me — clinic identity
+// GET /api/clinics/me - clinic identity
 router.get('/me', (req, res) => {
   res.json({
     clinicId: req.user.clinic_id || req.user.sub,
@@ -27,7 +27,7 @@ router.get('/me', (req, res) => {
   });
 });
 
-// GET /api/clinics/:clinicId/staff — list staff at a clinic
+// GET /api/clinics/:clinicId/staff - list staff at a clinic
 router.get('/:clinicId/staff', (req, res) => {
   const { clinicId } = req.params;
 
@@ -43,11 +43,11 @@ router.get('/:clinicId/staff', (req, res) => {
   res.json({
     clinicId,
     staff: [],
-    note: 'Stub — implement LDAP/DB query and enforce clinic_id isolation'
+    note: 'Stub - implement LDAP/DB query and enforce clinic_id isolation'
   });
 });
 
-// POST /api/clinics/onboard — register a new clinic into the federation
+// POST /api/clinics/onboard - register a new clinic into the federation
 router.post('/onboard', async (req, res) => {
   const { clinicId, clinicName, federationType, ldapUrl } = req.body;
 
@@ -75,7 +75,7 @@ router.post('/onboard', async (req, res) => {
     clinicId,
     clinicName,
     federationType,
-    note: 'Stub — implement clinic onboarding pipeline as described in pipelines/clinic-onboarding/'
+    note: 'Stub - implement clinic onboarding pipeline as described in pipelines/clinic-onboarding/'
   });
 });
 

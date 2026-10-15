@@ -1,16 +1,13 @@
 version: "3.9"
 
-# =============================================================================
-# VitalGov IdentityForge — Local Development Stack
-# =============================================================================
+# VitalGov IdentityForge - Local Development Stack
 # Services:
-#   postgres        — Application DB (data sovereignty: af-south-1 in production)
-#   openldap        — LDAP server for clinic federation testing
-#   phpldapadmin    — LDAP admin UI
-#   keycloak        — Identity provider (3 realms: staff, clinics, admin)
-#   vitalgov-api    — Node.js API
-#   anomaly-agent   — Python anomaly detection agent
-# =============================================================================
+#   postgres        - Application DB (data sovereignty: af-south-1 in production)
+#   openldap        - LDAP server for clinic federation testing
+#   phpldapadmin    - LDAP admin UI
+#   keycloak        - Identity provider (3 realms: staff, clinics, admin)
+#   vitalgov-api    - Node.js API
+#   anomaly-agent   - Python anomaly detection agent
 
 services:
   postgres:

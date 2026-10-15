@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
-# =============================================================================
 # provision-device.sh
-# VitalGov IdentityForge — Staff Device Provisioning
-# =============================================================================
+# VitalGov IdentityForge - Staff Device Provisioning
 # Issues a client cert and Keycloak account for a new health ministry staff member.
 #
 # Usage: ./provision-device.sh <STAFF_ID> <OFFICE_CODE> <STATE>
 #
 # Prerequisites: step CLI, kcadm.sh, openssl
-# =============================================================================
 
 set -euo pipefail
 
@@ -39,7 +36,7 @@ openssl req -new \
 #   --ca-url "${CA_URL}" --root ./certs/ca.crt \
 #   --provisioner vitalgov-staff --not-after 8760h
 echo "PLACEHOLDER" > "${CERTS_DIR}/staff.crt"
-log "WARN: Cert placeholder — implement step ca sign"
+log "WARN: Cert placeholder - implement step ca sign"
 
 # TODO (mentee): create Keycloak user in vitalgov-staff realm with
 #   attributes: office_code, state, cert_cn, data_residency_attestation=af-south-1

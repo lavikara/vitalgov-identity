@@ -1,4 +1,4 @@
-# VitalGov IdentityForge — Architecture
+# VitalGov IdentityForge - Architecture
 
 ## System overview
 

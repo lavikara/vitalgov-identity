@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
-# =============================================================================
 # renew-certs.sh
-# VitalGov IdentityForge — Certificate Renewal (daily cron)
-# =============================================================================
+# VitalGov IdentityForge - Certificate Renewal (daily cron)
 # Renews staff and clinic certs expiring within RENEWAL_THRESHOLD_DAYS.
 # Usage: ./renew-certs.sh [--dry-run]
-# =============================================================================
 
 set -euo pipefail
 

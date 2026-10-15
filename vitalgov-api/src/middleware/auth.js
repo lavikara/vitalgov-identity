@@ -4,7 +4,7 @@
  * auth.js
  * Validates Keycloak-issued JWTs for VitalGov.
  * Three realms: vitalgov-staff, vitalgov-clinics, vitalgov-admin.
- * Token lifetime is 10 minutes (NHA compliance — shorter than default Keycloak).
+ * Token lifetime is 10 minutes (NHA compliance - shorter than default Keycloak).
  */
 
 const jwt = require('jsonwebtoken');

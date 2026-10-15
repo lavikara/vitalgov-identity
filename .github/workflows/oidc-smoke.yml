@@ -1,0 +1,29 @@
+name: oidc-smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cloud
+    paths:
+      - 'infrastructure/terraform/**'
+      - '.github/workflows/oidc-smoke.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  assume-role:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Assume the deploy role over OIDC
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          aws-region: af-south-1
+          role-to-assume: arn:aws:iam::690998796988:role/vitalgov-production-github-actions
+          role-session-name: vitalgov-oidc-smoke
+          allowed-account-ids: "690998796988"
+
+      - name: Show the assumed identity
+        run: aws sts get-caller-identity

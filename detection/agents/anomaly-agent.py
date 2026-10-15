@@ -1,27 +1,24 @@
 #!/usr/bin/env python3
-"""
-VitalGov Anomaly Detection Agent
-===================================
-Consumes API audit logs and runs three detection models with NHA-referenced baselines:
-
-  Model 1 — Bulk Record Access:
-    Flags users accessing more than BULK_THRESHOLD records in WINDOW_MINUTES.
-    Baselines are role-adjusted: clinicians have higher thresholds than admin staff.
-    (NHA Section 26 — Protection of Health Information)
-
-  Model 2 — Cross-Clinic Access:
-    Flags when a user's clinic_id in the token does not match the clinic_id
-    in the resource path they are accessing.
-    (NHA Section 27 — Authorised Access Controls)
-
-  Model 3 — Data Residency Violation:
-    Flags requests where data_residency_attestation is missing or not 'af-south-1'.
-    (NHA Sections 26, 28 — Data Sovereignty)
-
-Usage:
-    python anomaly-agent.py --log-file /var/log/vitalgov/audit.log
-    python anomaly-agent.py --log-file /var/log/vitalgov/audit.log --mode stream
-"""
+# VitalGov Anomaly Detection Agent.
+# Consumes API audit logs and runs three detection models with NHA-referenced baselines:
+#
+#   Model 1 - Bulk Record Access:
+#     Flags users accessing more than BULK_THRESHOLD records in WINDOW_MINUTES.
+#     Baselines are role-adjusted: clinicians have higher thresholds than admin staff.
+#     (NHA Section 26 - Protection of Health Information)
+#
+#   Model 2 - Cross-Clinic Access:
+#     Flags when a user's clinic_id in the token does not match the clinic_id
+#     in the resource path they are accessing.
+#     (NHA Section 27 - Authorised Access Controls)
+#
+#   Model 3 - Data Residency Violation:
+#     Flags requests where data_residency_attestation is missing or not 'af-south-1'.
+#     (NHA Sections 26, 28 - Data Sovereignty)
+#
+# Usage:
+#     python anomaly-agent.py --log-file /var/log/vitalgov/audit.log
+#     python anomaly-agent.py --log-file /var/log/vitalgov/audit.log --mode stream
 
 import argparse
 import json
@@ -76,15 +73,15 @@ class AnomalyDetector:
             if e[0].timestamp() > cutoff
         ]
 
+    # Return role-adjusted bulk access threshold (NHA baseline).
     def _get_threshold(self, entry: dict) -> int:
-        """Return role-adjusted bulk access threshold (NHA baseline)."""
         roles = entry.get("roles", [])
         if "clinician" in roles:
             return BULK_THRESHOLD_CLINICIAN
         return BULK_THRESHOLD_ADMIN
 
+    # Model 1: Bulk record access - role-adjusted threshold. (NHA Section 26)
     def _check_bulk_access(self, user_id: str, entry: dict):
-        """Model 1: Bulk record access — role-adjusted threshold. (NHA Section 26)"""
         cutoff = datetime.now(timezone.utc).timestamp() - (WINDOW_MINUTES * 60)
         recent_records = [
             e for e in self.request_log[user_id]
@@ -101,8 +98,8 @@ class AnomalyDetector:
                 "nhaSections": ["Section 26"]
             })
 
+    # Model 2: Token clinic_id does not match resource clinic_id. (NHA Section 27)
     def _check_cross_clinic(self, user_id: str, path: str, token_clinic_id: str):
-        """Model 2: Token clinic_id does not match resource clinic_id. (NHA Section 27)"""
         if '/clinics/' not in path or not token_clinic_id:
             return
         parts = path.split('/clinics/')
@@ -118,8 +115,8 @@ class AnomalyDetector:
                 "nhaSections": ["Section 27"]
             })
 
+    # Model 3: Data residency violation. (NHA Sections 26, 28)
     def _check_data_residency(self, user_id: str, attestation: str, path: str):
-        """Model 3: Data residency violation. (NHA Sections 26, 28)"""
         if '/records' not in path:
             return
         if attestation != ALLOWED_DATA_REGION:

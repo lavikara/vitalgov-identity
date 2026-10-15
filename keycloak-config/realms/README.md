@@ -14,11 +14,11 @@ Place exported realm JSON files here. Keycloak imports them on startup via `--im
 
 Configure these via Protocol Mapper in each client:
 
-- `licence_number` — professional licence ID
-- `licence_status` — `active` | `suspended` | `revoked`
-- `clinic_id` — affiliated clinic (clinics realm only)
-- `patient_access_scope` — `read` | `write` | `read-write`
-- `data_residency_attestation` — must equal `af-south-1` (NHA Sections 26, 28)
+- `licence_number`, professional licence ID
+- `licence_status`, `active` | `suspended` | `revoked`
+- `clinic_id`, affiliated clinic (clinics realm only)
+- `patient_access_scope`, `read` | `write` | `read-write`
+- `data_residency_attestation`, must equal `af-south-1` (NHA Sections 26, 28)
 
 ## Token lifetime
 

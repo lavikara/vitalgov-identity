@@ -1,6 +1,6 @@
 # VitalGov IdentityForge
 
-Expadox Lab Cohort 3 — Capstone Project (Team 2)
+Expadox Lab Cohort 3 - Capstone Project (Team 2)
 
 A zero-trust identity platform for Nigeria's National Health Act (NHA) compliance. Covers multi-realm Keycloak federation, mutual TLS enforcement, data sovereignty enforcement to `af-south-1`, and real-time anomaly detection aligned to NHA Sections 26-29.
 
@@ -33,7 +33,7 @@ Services:
 ## Directory structure
 
 ```
-vitalgov-clean/
+vitalgov-identity/
 ├── vitalgov-api/          Node.js API
 │   └── src/
 │       ├── middleware/    auth, mtls, roles, audit, dataResidency
@@ -43,14 +43,19 @@ vitalgov-clean/
 │       └── anomaly-agent.py   Three NHA detection models
 ├── pipelines/
 │   ├── clinic-onboarding/     onboard-clinic.sh
-│   ├── cert-management/       renew-certs.sh, provision-device.sh
+│   ├── cert-renewal/          renew-certs.sh
+│   ├── device-provisioning/   provision-device.sh
 │   └── offboarding/           offboard-staff.sh (NHA Section 29)
 ├── apps/test-client/          test-client.py (staff / clinic / residency / anomaly modes)
-├── infrastructure/db/         schema.sql (af-south-1 constraint on patient_records)
+├── infrastructure/
+│   ├── db/                schema.sql (af-south-1 constraint on patient_records)
+│   └── terraform/         wave-1 AWS infrastructure in af-south-1
 ├── keycloak-config/realms/    Drop exported realm JSON files here
 └── docs/
     ├── architecture.md
-    └── operator-handbook.md
+    ├── operator-handbook.md
+    └── cloud/             aws-architecture, ip-addressing-plan,
+                           network-traffic-flows, architecture-decisions
 ```
 
 ---
@@ -92,14 +97,21 @@ These are intentional gaps for mentees to complete:
 
 ---
 
+## Cloud infrastructure
+
+Wave-1 AWS infrastructure, all in `af-south-1`, is Terraform under `infrastructure/terraform/`
+(variables, init and plan steps in its README). Design rationale, IP plan and traffic flows live
+in `docs/cloud/`; `architecture-decisions.md` is the review sign-off document. Teardown steps are
+in `TEARDOWN.md`.
+
+---
+
 ## Pushing to GitHub
 
 ```bash
-cd path/to/identityforge-vitalgov/vitalgov-clean
-git init
-git add .
-git commit -m "feat: VitalGov IdentityForge capstone — Team 2"
-git remote add origin https://github.com/expadox/identityforge-vitalgov.git
-git branch -M main
-git push -u origin main
+git clone https://github.com/lavikara/vitalgov-identity.git
+cd vitalgov-identity
 ```
+
+Infrastructure and cloud docs are developed on the `cloud` branch. Open a PR
+`cloud` -> `main` and merge after review sign-off.

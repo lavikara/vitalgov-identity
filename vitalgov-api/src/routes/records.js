@@ -5,11 +5,11 @@
  * Patient health record endpoints. Requires JWT + data_residency_attestation claim (NHA).
  *
  * Custom JWT claims required per capstone brief:
- *   licence_number        — clinician's NHA-registered licence
- *   licence_status        — "active" | "suspended" | "revoked"
- *   clinic_id             — clinic the clinician belongs to
- *   patient_access_scope  — "read" | "write" | "admin"
- *   data_residency_attestation — must equal "af-south-1"
+ *   licence_number        - clinician's NHA-registered licence
+ *   licence_status        - "active" | "suspended" | "revoked"
+ *   clinic_id             - clinic the clinician belongs to
+ *   patient_access_scope  - "read" | "write" | "admin"
+ *   data_residency_attestation - must equal "af-south-1"
  *
  * DELIBERATE CHALLENGE: licence_status is not enforced. A suspended clinician
  * can still read records. Mentees must add that check.
@@ -20,7 +20,7 @@ const { v4: uuidv4 } = require('uuid');
 const logger = require('../utils/logger');
 const router = express.Router();
 
-// POST /api/records — create a patient record
+// POST /api/records - create a patient record
 router.post('/', (req, res) => {
   const { patientId, recordType, payload } = req.body;
 
@@ -31,7 +31,7 @@ router.post('/', (req, res) => {
   // CHALLENGE: verify req.user.licence_status === 'active' before allowing writes
   if (req.user.licence_status && req.user.licence_status !== 'active') {
     logger.warn({
-      message: 'Write attempt by non-active clinician (not enforced — challenge)',
+      message: 'Write attempt by non-active clinician (not enforced - challenge)',
       userId: req.user.sub,
       licenceStatus: req.user.licence_status
     });
@@ -54,11 +54,11 @@ router.post('/', (req, res) => {
     recordId,
     status: 'accepted',
     dataRegion: req.dataRegion,
-    note: 'Stub — connect to PostgreSQL to persist records'
+    note: 'Stub - connect to PostgreSQL to persist records'
   });
 });
 
-// GET /api/records/:id — fetch a patient record
+// GET /api/records/:id - fetch a patient record
 router.get('/:id', (req, res) => {
   const { id } = req.params;
 
@@ -74,7 +74,7 @@ router.get('/:id', (req, res) => {
     status: 'stub',
     clinicId: req.user.clinic_id,
     dataRegion: req.dataRegion,
-    note: 'Stub response — connect to PostgreSQL'
+    note: 'Stub response - connect to PostgreSQL'
   });
 });
 

@@ -1,7 +1,7 @@
 {
   "name": "vitalgov-api",
   "version": "1.0.0",
-  "description": "VitalGov Identity and Security API — IdentityForge Capstone",
+  "description": "VitalGov Identity and Security API - IdentityForge Capstone",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",

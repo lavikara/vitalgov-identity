@@ -1,4 +1,4 @@
-# VitalGov IdentityForge — Operator Handbook
+# VitalGov IdentityForge - Operator Handbook
 
 ## Daily checks
 

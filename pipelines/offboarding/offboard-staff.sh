@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
-# =============================================================================
 # offboard-staff.sh
-# VitalGov IdentityForge — Staff Offboarding Pipeline
-# =============================================================================
+# VitalGov IdentityForge - Staff Offboarding Pipeline
 # SLA: complete within 30 minutes. NHA Section 29 requires audit trail.
 # Usage: ./offboard-staff.sh <STAFF_ID> "<REASON>"
-# =============================================================================
 
 set -euo pipefail
 
@@ -29,7 +26,7 @@ log "Step 1: Disabling Keycloak account..."
 # kcadm.sh update users/"${KC_USER_ID}" -r vitalgov-staff -s enabled=false
 log "WARN: Keycloak disable stubbed"
 
-# Step 2: Revoke sessions (NHA Section 29 — immediate access termination)
+# Step 2: Revoke sessions (NHA Section 29 - immediate access termination)
 log "Step 2: Revoking all sessions..."
 SESSION_START=$(date +%s)
 # TODO (mentee): kcadm.sh delete users/"${KC_USER_ID}"/sessions -r vitalgov-staff

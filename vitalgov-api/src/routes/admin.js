@@ -11,7 +11,7 @@ const axios = require('axios');
 const logger = require('../utils/logger');
 const router = express.Router();
 
-// GET /api/admin/audit — query audit events
+// GET /api/admin/audit - query audit events
 router.get('/audit', (req, res) => {
   const { userId, clinicId, from, to, limit = 100 } = req.query;
 
@@ -25,11 +25,11 @@ router.get('/audit', (req, res) => {
   res.json({
     events: [],
     filters: { userId, clinicId, from, to, limit },
-    note: 'Stub — connect to PostgreSQL audit_events table'
+    note: 'Stub - connect to PostgreSQL audit_events table'
   });
 });
 
-// POST /api/admin/revoke-clinician — revoke a clinician's access across all clinics
+// POST /api/admin/revoke-clinician - revoke a clinician's access across all clinics
 router.post('/revoke-clinician', async (req, res) => {
   const { clinicianId, reason } = req.body;
   if (!clinicianId) return res.status(400).json({ error: 'clinicianId is required' });
@@ -57,12 +57,12 @@ router.post('/revoke-clinician', async (req, res) => {
   }
 });
 
-// GET /api/admin/data-residency/violations — list requests that breached af-south-1 requirement
+// GET /api/admin/data-residency/violations - list requests that breached af-south-1 requirement
 router.get('/data-residency/violations', (req, res) => {
   // TODO (mentee challenge): query audit_events where data_residency_attestation != 'af-south-1'
   res.json({
     violations: [],
-    note: 'Stub — query audit_events table for data residency violations (NHA Sections 26, 28)'
+    note: 'Stub - query audit_events table for data residency violations (NHA Sections 26, 28)'
   });
 });
 

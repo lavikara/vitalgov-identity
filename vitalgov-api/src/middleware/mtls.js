@@ -3,7 +3,7 @@
 /**
  * mtls.js
  * Validates client certificates forwarded by APISIX/Kong via XFCC header.
- * Applied to /api/clinics routes — all clinic endpoints require mTLS.
+ * Applied to /api/clinics routes - all clinic endpoints require mTLS.
  */
 
 const logger = require('../utils/logger');

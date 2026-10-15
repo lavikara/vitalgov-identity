@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# =============================================================================
 # onboard-clinic.sh
-# VitalGov IdentityForge — Clinic Onboarding Pipeline
-# =============================================================================
+# VitalGov IdentityForge - Clinic Onboarding Pipeline
 # Onboards a new clinic (200 clinics total) into the VitalGov federation.
 # Supports three federation types: ldap, saml, keycloak-native.
 #
@@ -17,7 +15,6 @@
 #   5. Send welcome config bundle to clinic IT contact
 #
 # Prerequisites: kcadm.sh, step CLI, psql, curl, jq
-# =============================================================================
 
 set -euo pipefail
 
@@ -87,7 +84,7 @@ case "${FEDERATION_TYPE}" in
     log "WARN: SAML IdP configuration stubbed."
     ;;
   keycloak-native)
-    log "Using Keycloak-native auth — no external federation required."
+    log "Using Keycloak-native auth - no external federation required."
     ;;
   *)
     log "ERROR: Unknown federation type '${FEDERATION_TYPE}'. Use: ldap | saml | keycloak-native"
@@ -112,7 +109,7 @@ openssl req -new \
 #   --provisioner-password-file ./secrets/provisioner.pass \
 #   --not-after 8760h
 
-echo "PLACEHOLDER — replace with real Smallstep step ca sign output" > "${CERTS_DIR}/clinic.crt"
+echo "PLACEHOLDER - replace with real Smallstep step ca sign output" > "${CERTS_DIR}/clinic.crt"
 log "WARN: Using placeholder cert."
 
 # --- Step 4: Write to PostgreSQL ---

@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-"""
-VitalGov IdentityForge Test Client
-=====================================
-Exercises the VitalGov API with real Keycloak tokens and mTLS certs.
-
-Usage:
-    python test-client.py --mode staff
-    python test-client.py --mode clinic
-    python test-client.py --mode residency   # tests data residency enforcement
-    python test-client.py --mode anomaly     # generates suspicious traffic
-
-Prerequisites:
-    pip install requests python-dotenv
-"""
+# VitalGov IdentityForge test client: exercises the VitalGov API with real
+# Keycloak tokens and mTLS certs.
+#
+# Usage:
+#     python test-client.py --mode staff
+#     python test-client.py --mode clinic
+#     python test-client.py --mode residency   # tests data residency enforcement
+#     python test-client.py --mode anomaly     # generates suspicious traffic
+#
+# Prerequisites:
+#     pip install requests python-dotenv
 
 import argparse
 import json
@@ -46,12 +43,12 @@ def get_token(realm: str, client_id: str, client_secret: str) -> str:
     }, verify=CA_CERT)
     resp.raise_for_status()
     token = resp.json()["access_token"]
-    print(f"[AUTH] Token obtained — realm={realm}, client={client_id}")
+    print(f"[AUTH] Token obtained - realm={realm}, client={client_id}")
     return token
 
 
+# Authenticate as a health ministry staff member and call /api/records.
 def mode_staff():
-    """Authenticate as a health ministry staff member and call /api/records."""
     client_id = os.getenv("STAFF_CLIENT_ID", "staff-test-client")
     client_secret = os.getenv("STAFF_CLIENT_SECRET", "change-me")
     token = get_token(STAFF_REALM, client_id, client_secret)
@@ -61,12 +58,12 @@ def mode_staff():
         headers={"Authorization": f"Bearer {token}"},
         verify=CA_CERT
     )
-    print(f"[STAFF] GET /api/records — Status: {resp.status_code}")
+    print(f"[STAFF] GET /api/records - Status: {resp.status_code}")
     print(json.dumps(resp.json(), indent=2))
 
 
+# Authenticate as a clinic with mTLS and call /api/clinics/me.
 def mode_clinic():
-    """Authenticate as a clinic with mTLS and call /api/clinics/me."""
     client_id = os.getenv("CLINIC_CLIENT_ID", "clinic-test-client")
     client_secret = os.getenv("CLINIC_CLIENT_SECRET", "change-me")
     token = get_token(CLINIC_REALM, client_id, client_secret)
@@ -78,20 +75,18 @@ def mode_clinic():
         cert=cert,
         verify=CA_CERT
     )
-    print(f"[CLINIC] GET /api/clinics/me — Status: {resp.status_code}")
+    print(f"[CLINIC] GET /api/clinics/me - Status: {resp.status_code}")
     print(json.dumps(resp.json(), indent=2))
 
 
+# Test data residency enforcement. Expects a token with the
+# data_residency_attestation claim present or absent.
 def mode_residency():
-    """
-    Test data residency enforcement.
-    Expects a token with data_residency_attestation claim present/absent.
-    """
     client_id = os.getenv("STAFF_CLIENT_ID", "staff-test-client")
     client_secret = os.getenv("STAFF_CLIENT_SECRET", "change-me")
     token = get_token(STAFF_REALM, client_id, client_secret)
 
-    print("[RESIDENCY] Attempting record access — check for NHA data residency enforcement...")
+    print("[RESIDENCY] Attempting record access - check for NHA data residency enforcement...")
     resp = requests.post(
         f"{API_BASE}/api/records",
         headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
@@ -104,16 +99,14 @@ def mode_residency():
     if resp.status_code == 403 and 'NHA' in resp.text:
         print("[RESIDENCY] PASS: data residency claim correctly enforced")
     elif resp.status_code == 202:
-        print("[RESIDENCY] INFO: request accepted — verify data_residency_attestation claim is present in token")
+        print("[RESIDENCY] INFO: request accepted - verify data_residency_attestation claim is present in token")
     else:
-        print("[RESIDENCY] INFO: unexpected response — review middleware configuration")
+        print("[RESIDENCY] INFO: unexpected response - review middleware configuration")
 
 
+# Generate suspicious access patterns for detection model testing:
+# bulk record access, cross-clinic query, off-hours access.
 def mode_anomaly():
-    """
-    Generate suspicious access patterns for detection model testing.
-    Simulates: bulk record access, cross-clinic query, off-hours access.
-    """
     client_id = os.getenv("STAFF_CLIENT_ID", "staff-test-client")
     client_secret = os.getenv("STAFF_CLIENT_SECRET", "change-me")
     token = get_token(STAFF_REALM, client_id, client_secret)
